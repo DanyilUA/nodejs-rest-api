@@ -5,13 +5,13 @@ const contactsService = require('../models/contacts');
 
 const contactSchema = Joi.object({
   name: Joi.string().required().messages({
-    'any.required': `"name" is a required field`,
+    'any.required': `missing required name field`,
   }),
   email: Joi.string().required().messages({
-    'any.required': `"email" is a required field`,
+    'any.required': `missing required email field`,
   }),
   phone: Joi.number().required().messages({
-    'any.required': `"phone" is a required field`,
+    'any.required': `missing required phone field`,
   }),
 });
 
@@ -29,7 +29,7 @@ const getContact = async (req, res, next) => {
     const { contactId } = req.params;
     const result = await contactsService.getContactById(contactId);
     if (!result) {
-      throw HttpError(404, `Contact ${contactId} not found`);
+      throw HttpError(404, `Not found`);
     }
     res.json(result);
   } catch (error) {
@@ -39,9 +39,6 @@ const getContact = async (req, res, next) => {
 
 const createContact = async (req, res, next) => {
   try {
-    if (!Object.keys(req.body).length) {
-      throw HttpError(400, 'All fields are empty');
-    }
 
     const { error } = contactSchema.validate(req.body);
     if (error) {
@@ -56,9 +53,6 @@ const createContact = async (req, res, next) => {
 
 const updateContactById = async (req, res, next) => {
   try {
-    if (!Object.keys(req.body).length) {
-      throw HttpError(400, 'All fields are empty');
-    }
 
     const { error } = contactSchema.validate(req.body);
     if (error) {
@@ -68,9 +62,9 @@ const updateContactById = async (req, res, next) => {
 
     const result = await contactsService.updateContact(contactId, req.body);
     if (!result) {
-      throw HttpError(400, error.message);
+      throw HttpError(404, "Not found");
     }
-    res.json(result);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -81,10 +75,10 @@ const deleteContact = async (req, res, next) => {
     const { contactId } = req.params;
     const result = await contactsService.removeContact(contactId);
     if (!result) {
-      throw HttpError(400, error.message);
+      throw HttpError(404, "Not found");
     }
     res.json({
-      message: 'Dete success',
+      message: 'contact deleted',
     });
   } catch (error) {
     next(error);
