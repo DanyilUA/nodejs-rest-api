@@ -18,7 +18,6 @@ const signup = async (req, res, next) => {
         const avatarDefault = gravatar.url(email);
         const verificationToken = nanoid();
 
-
         if (user) {
             throw HttpError(409, `${email} Email in use`);
         }
@@ -32,9 +31,9 @@ const signup = async (req, res, next) => {
         });
 
     const verifyEmail = {
-      to: email,
+      to: newUser.email,
       subject: 'Verify email',
-      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verify email</a>`,
     };
 
         await sendEmail(verifyEmail);
@@ -149,14 +148,14 @@ const verifyEmail = async (req, res, next) => {
 try {
       const { verificationToken } = req.params;
       const user = await User.findOne({ verificationToken });
-
+    
       if (!user) {
         throw HttpError(404, 'User not found');
       }
 
       await User.findByIdAndUpdate(user._id, {
         verify: true,
-        verificationToken: "",
+        verificationToken: null,
       });
 
       res.json({
@@ -180,7 +179,7 @@ const resendVerifyEmail = async (req, res) => {
   const verifyEmail = {
     to: email,
     subject: 'Verify email',
-    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationToken}">Click verify email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click verify email</a>`,
   };
 
   await sendEmail(verifyEmail);
