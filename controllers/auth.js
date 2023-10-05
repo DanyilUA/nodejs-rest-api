@@ -1,5 +1,4 @@
 const User = require('../models/User');
-
 const { HttpError } = require('../helpers/index');
 
 const signup = async (req, res, next) => {

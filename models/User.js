@@ -1,12 +1,12 @@
+const mongoose = require('mongoose');
+
 const { Schema, model } = require('mongoose');
 const { handleSaveError, runValidatorsAtUpdate } = require('./hooks');
 const { HttpError } = require('../helpers/index');
 
-
 const Joi = require('joi');
 
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
 
 const userSchema = new Schema(
   {
@@ -36,15 +36,14 @@ userSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
 userSchema.post('findOneAndUpdate', handleSaveError);
 
 const userSignUpSchema = Joi.object({
-    
-  name: Joi.string().required().messages({
+  username: Joi.string().required().messages({
     'any.required': 'missing required name field',
   }),
   email: Joi.string().required().messages({
     'any.required': 'missing required email field',
   }),
-  phone: Joi.string().required().messages({
-    'any.required': 'missing required phone field',
+  password: Joi.string().required().messages({
+    'any.required': 'missing required password field',
   }),
 });
 
@@ -53,7 +52,7 @@ const userSignInSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
-const User = model("user", userSchema);
+const User = model('user', userSchema);
 
 const validationBodySignIn = (req, res, next) => {
   const { error } = userSignInSchema.validate(req.body);
@@ -70,7 +69,6 @@ const validationBodySignUp = (req, res, next) => {
   }
   next();
 };
-
 
 module.exports = {
   User,
