@@ -1,12 +1,14 @@
 const multer = require('multer');
 const path = require('path');
+const { nanoid } = require('nanoid');
+
 
 const destination = path.resolve('temp');
 
 const storage = multer.diskStorage({
     destination,
     filename: (req, file, cb) => {
-        const uniquePreffix = `${Data.now()}_${Math.round(Math.random() * 1E9)}`;
+        const uniquePreffix = nanoid();
         const filename = `${uniquePreffix}_${file.originalname}`;
         cb(null, filename);
     }
