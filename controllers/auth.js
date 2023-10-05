@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { JWT_SECRET } = process.env;
-const {User} = require('../models/User');
+const { User } = require('../models/User');
+const fs = require('fs/promises');
+const path = require('path');
+
+const avatarsPath = path.resolve("public", "avatars");
 
 const signup = async (req, res, next) => {
     try {
@@ -98,12 +102,22 @@ const logout = async (req, res, next) => {
     }
 };
 
+const updateAvatar = async (req, res, next) => { 
+    const { _id } = req.user;
+    const { path: oldPath, filename } = req.file;
+    const newPath = path.join(avatarsPath, filename);
+    await fs.rename(oldPath, newPath);
+
+}
+// add the image of boria to temp folder;
+
 module.exports = {
   signup,
   signin,
   getCurrent,
   logout,
   updateSubscription,
+  updateAvatar,
 };
 
 
