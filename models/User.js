@@ -1,6 +1,6 @@
-const { Schema, model } = require('mongoose');
 const { handleSaveError, runValidatorsAtUpdate } = require('./hooks');
 const { HttpError } = require('../helpers/index');
+const { Schema, model } = require('mongoose');
 
 const Joi = require('joi');
 
@@ -28,7 +28,7 @@ const userSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       ref: 'user',
-      required: true,
+    //   required: true,
     },
     token: {
       type: String,

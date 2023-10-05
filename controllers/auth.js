@@ -7,17 +7,18 @@ const { JWT_SECRET } = process.env;
 
 const signup = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        // const { email, password } = req.body;
+        // const user = await User.findOne({ email });
 
-        if (user) {
-            throw HttpError(409, `${email} Eamil in use`);
-        }
+        // if (user) {
+        //     throw HttpError(409, `${email} Email in use`);
+        // }
 
-        req.user = user;
-        const hashPassword = await bcrypt.hash(password, 10);
+        // // req.user = user;
+        // const hashPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await User.create({ ...req.body, password: hashPassword });
+        // const newUser = await User.create({ ...req.body, password: hashPassword });
+        const newUser = await User.create(req.body);
         
         res.status(201).json({
           subscription: newUser.subscription,
