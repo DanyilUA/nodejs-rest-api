@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const { Schema, model } = require('mongoose');
 const { handleSaveError, runValidatorsAtUpdate } = require('./hooks');
 const { HttpError } = require('../helpers/index');
@@ -10,10 +8,6 @@ const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const userSchema = new Schema(
   {
-    username: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       match: emailRegexp,
@@ -24,6 +18,19 @@ const userSchema = new Schema(
       type: String,
       minlength: 6,
       required: [true, 'Set password for user'],
+    },
+    subscription: {
+      type: String,
+      enum: ['starter', 'pro', 'business'],
+      default: 'starter',
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
+    token: {
+      type: String,
     },
   },
   { versionKey: false, timestamps: true }
@@ -36,20 +43,22 @@ userSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
 userSchema.post('findOneAndUpdate', handleSaveError);
 
 const userSignUpSchema = Joi.object({
-  username: Joi.string().required().messages({
-    'any.required': 'missing required name field',
-  }),
   email: Joi.string().required().messages({
     'any.required': 'missing required email field',
   }),
   password: Joi.string().required().messages({
     'any.required': 'missing required password field',
   }),
+  subscription: Joi.string()
 });
 
 const userSignInSchema = Joi.object({
-  email: Joi.string().pattern(emailRegexp).required(),
-  password: Joi.string().min(6).required(),
+  email: Joi.string().pattern(emailRegexp).required().messages({
+    'any.required': 'missing required email field',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'any.required': 'missing required password field',
+  }),
 });
 
 const User = model('user', userSchema);

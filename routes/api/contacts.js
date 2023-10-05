@@ -2,9 +2,10 @@ const express = require('express')
 
 const router = express.Router()
 const contactsController = require("../../controllers/contact");
-const { isEmptyBody, isValidId, isEmptFieldFavorite } = require('../../middlewares/index');
+const { isEmptyBody, authenticate, isValidId, isEmptFieldFavorite } = require('../../middlewares/index');
 const { validationBody, contactUpdateFavorite } = require('../../models/Contact');
 
+// router.use(authenticate);
 
 router.get('/', contactsController.getAllContacts);
 
