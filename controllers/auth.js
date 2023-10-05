@@ -6,6 +6,7 @@ const { JWT_SECRET } = process.env;
 const { User } = require('../models/User');
 const fs = require('fs/promises');
 const path = require('path');
+const gravatar = require('gravatar');
 
 const avatarsPath = path.resolve("public", "avatars");
 
@@ -13,12 +14,15 @@ const signup = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
+        const avatarDefault = gravatar.url(email);
+
 
         if (user) {
             throw HttpError(409, `${email} Email in use`);
         }
+
         const hashPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ ...req.body, password: hashPassword });
+        const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL: avatarDefault });
     res.status(201).json({
       user: {
         email: newUser.email,
@@ -35,6 +39,7 @@ const signin = async (req, res, next) => {
         try {
             const { email, password } = req.body;
             const user = await User.findOne({ email });
+
 
             if (!user) {
                 throw HttpError(401, 'Email or password is wrong');
@@ -103,13 +108,23 @@ const logout = async (req, res, next) => {
 };
 
 const updateAvatar = async (req, res, next) => { 
-    const { _id } = req.user;
-    const { path: oldPath, filename } = req.file;
-    const newPath = path.join(avatarsPath, filename);
-    await fs.rename(oldPath, newPath);
+    try {
+        const { _id } = req.user;
+        const { path: oldPath, filename } = req.file;
+        const newPath = path.join(avatarsPath, filename);
+        await fs.rename(oldPath, newPath);
+        const avatarURL = path.join('avatars', filename);
 
+        await User.findByIdAndUpdate(_id, { avatarURL });
+
+        res.json({
+            avatarURL,
+        });
+
+    } catch (error) {
+        next(error);
+    }
 }
-// add the image of boria to temp folder;
 
 module.exports = {
   signup,
