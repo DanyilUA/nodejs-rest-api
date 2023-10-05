@@ -64,7 +64,7 @@ const userSignInSchema = Joi.object({
 });
 
 const userSubscriptionSchema = Joi.object({
-  subscription: Joi.string()
+    subscription: Joi.string()
     .valid(...subscriptionType)
     .required()
     .messages({ 'any.required': 'missing required "subscription" field' }),
@@ -97,8 +97,8 @@ const validateSubscription = (req, res, next) => {
 }
 
 module.exports = {
-  User,
-  validationBodySignIn,
-  validationBodySignUp,
-  validateSubscription,
+    validationBodySignIn,
+    validationBodySignUp,
+    validateSubscription,
+    User,
 };

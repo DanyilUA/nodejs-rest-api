@@ -10,7 +10,6 @@ const authenticate = async (req, res, next) => {
   if (bearer !== 'Bearer') {
     return next(HttpError(401));
   }
-  //  may be not id but contactId
   try {
     const { contactId } = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(contactId);

@@ -7,9 +7,7 @@ const { validationBodySignIn, validationBodySignUp, validateSubscription } = req
 
 const authRouter = express.Router();
 
-// authRouter.post('/register', isEmptyBody, validationBodySignUp, authController.signup);
-authRouter.post('/register', authController.signup);
-
+authRouter.post('/register', isEmptyBody, validationBodySignUp, authController.signup);
 authRouter.post('/login', isEmptyBody, validationBodySignIn, authController.signin);
 authRouter.get('/current', authenticate, authController.getCurrent);
 authRouter.post('/logout', authenticate, authController.logout);
