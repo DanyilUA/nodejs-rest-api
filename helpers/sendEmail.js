@@ -3,17 +3,19 @@ require('dotenv').config();
 const { PASSWORD_REAL } = process.env;
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.mail.ru',
+  host: 'smtp.ukr.net',
   port: 465,
   secure: true,
   auth: {
-    user: 'danyilkonotop@mail.ru',
+    user: 'danyilkonotop@ukr.net',
     pass: PASSWORD_REAL,
   },
 });
 
 const sendEmail = async (data) => {
-  await transporter.sendMail({ ...data, from: 'danyilkonotop@mail.ru' });
+    await transporter.sendMail({ ...data, from: 'danyilkonotop@ukr.net' });
 };
 
-module.exports = {sendEmail};
+module.exports = {
+    sendEmail,
+};

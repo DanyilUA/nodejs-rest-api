@@ -1,12 +1,13 @@
-const { HttpError } = require('../helpers/index');
+const { HttpError, sendEmail } = require('../helpers/index');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, BASE_URL } = process.env;
 const { User } = require('../models/User');
 const fs = require('fs/promises');
 const path = require('path');
 const gravatar = require('gravatar');
+const { nanoid } = require('nanoid');
 
 const avatarsPath = path.resolve("public", "avatars");
 
@@ -15,6 +16,7 @@ const signup = async (req, res, next) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         const avatarDefault = gravatar.url(email);
+        const verificationToken = nanoid();
 
 
         if (user) {
@@ -22,11 +24,25 @@ const signup = async (req, res, next) => {
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL: avatarDefault });
+        const newUser = await User.create({
+          ...req.body,
+          password: hashPassword,
+          avatarURL: avatarDefault,
+          verificationToken,
+        });
+
+    const verifyEmail = {
+      to: email,
+      subject: 'Verify email',
+      html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+    };
+
+        await sendEmail(verifyEmail);
+        
     res.status(201).json({
-      user: {
-        email: newUser.email,
-        subscription: newUser.subscription,
+        user: {
+            email: newUser.email,
+            subscription: newUser.subscription,
       },
     });
 
@@ -129,21 +145,25 @@ const updateAvatar = async (req, res, next) => {
 }
 
 const verifyEmail = async (req, res) => {
-  const { verificationCode } = req.params;
-  const user = await User.findOne({ verificationCode });
+try {
+      const { verificationToken } = req.params;
+      const user = await User.findOne({ verificationToken });
 
-  if (!user) {
-    throw HttpError(404, 'User not found');
-  }
+      if (!user) {
+        throw HttpError(404, 'User not found');
+      }
 
-  await User.findByIdAndUpdate(user._id, {
-    verificationCode: "",
-    verify: true,
-  });
+      await User.findByIdAndUpdate(user._id, {
+        verificationToken: null,
+        verify: true,
+      });
 
-  res.json({
-    message: 'Verification successful',
-  });
+      res.json({
+        message: 'Verification successful',
+      });
+} catch (error) {
+    next(error);
+}
 };
 
 const resendVerifyEmail = async (req, res) => {
@@ -159,7 +179,7 @@ const resendVerifyEmail = async (req, res) => {
   const verifyEmail = {
     to: email,
     subject: 'Verify email',
-    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}">Click verify email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationToken}">Click verify email</a>`,
   };
 
   await sendEmail(verifyEmail);
