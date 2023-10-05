@@ -13,15 +13,15 @@ const signup = async (req, res, next) => {
         if (user) {
             throw HttpError(409, `${email} Email in use`);
         }
-
         const hashPassword = await bcrypt.hash(password, 10);
-
         const newUser = await User.create({ ...req.body, password: hashPassword });
-        
-        res.status(201).json({
-          subscription: newUser.subscription,
-          email: newUser.email,
-        });
+    res.status(201).json({
+      user: {
+        email: newUser.email,
+        subscription: newUser.subscription,
+      },
+    });
+
   } catch (error) {
     next(error);
   }
@@ -42,17 +42,18 @@ const signin = async (req, res, next) => {
                 throw HttpError(401, 'Email or password is wrong');
             }
 
-            const payload = {
-                id: user._id,
-            }
+            const payload = {id: user._id}
 
             const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
             await User.findByIdAndUpdate(user._id, { token });
 
+
             res.json({
                 token,
+                user: {
+                email,
                 subscription: user.subscription,
-                email: user.email,
+                },
             });
             
         } catch (error) {
