@@ -4,7 +4,8 @@ const { isEmptFieldFavorite } = require('./isEmptyFieldFavorite')
 const { authenticate } = require('./authenticate');
 const { validationBody } = require('./validationBody');
 const { upload } = require('./upload');
-const {isEmptyAvatar} = require('./isEmptyAvatar')
+const { isEmptyAvatar } = require('./isEmptyAvatar');
+const { isValidEmail } = require('./isValidEmail');
 
 module.exports = {
   isEmptyBody,
@@ -14,4 +15,5 @@ module.exports = {
   validationBody,
   isEmptyAvatar,
   upload,
+  isValidEmail,
 };
