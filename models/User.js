@@ -103,9 +103,22 @@ const validateSubscription = (req, res, next) => {
     next();
 }
 
+const emailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+});
+
+const validationEmail = (req, res, next) => {
+const { error } = emailSchema.validate(req.body);
+if (error) {
+  return next(HttpError(400, error.message));
+}
+next();
+}
+
 module.exports = {
-    validationBodySignIn,
-    validationBodySignUp,
-    validateSubscription,
-    User,
+  validationBodySignIn,
+  validationBodySignUp,
+  validateSubscription,
+  User,
+  validationEmail,
 };

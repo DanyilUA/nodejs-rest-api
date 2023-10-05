@@ -53,34 +53,35 @@ const signup = async (req, res, next) => {
 
 const signin = async (req, res, next) => {
         try {
-            const { email, password } = req.body;
-            const user = await User.findOne({ email });
+          const { email, password } = req.body;
+          const user = await User.findOne({ email });
 
+          if (!user) {
+            throw HttpError(401, 'Email or password is wrong');
+          }
 
-            if (!user) {
-                throw HttpError(401, 'Email or password is wrong');
-            };
+          if (!user.verify) {
+            throw HttpError(401, 'Email not verified');
+          }
 
-            const passwordCompare = await bcrypt.compare(password, user.password);
+          const passwordCompare = await bcrypt.compare(password, user.password);
 
-            if (!passwordCompare) {
-                throw HttpError(401, 'Email or password is wrong');
-            }
+          if (!passwordCompare) {
+            throw HttpError(401, 'Email or password is wrong');
+          }
 
-            const payload = {id: user._id}
+          const payload = { id: user._id };
 
-            const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
-            await User.findByIdAndUpdate(user._id, { token });
+          const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '23h' });
+          await User.findByIdAndUpdate(user._id, { token });
 
-
-            res.json({
-                token,
-                user: {
-                email,
-                subscription: user.subscription,
-                },
-            });
-            
+          res.json({
+            token,
+            user: {
+              email,
+              subscription: user.subscription,
+            },
+          });
         } catch (error) {
             next(error);
         }
@@ -144,7 +145,7 @@ const updateAvatar = async (req, res, next) => {
     }
 }
 
-const verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res, next) => {
 try {
       const { verificationToken } = req.params;
       const user = await User.findOne({ verificationToken });
@@ -154,8 +155,8 @@ try {
       }
 
       await User.findByIdAndUpdate(user._id, {
-        verificationToken: null,
         verify: true,
+        verificationToken: "",
       });
 
       res.json({

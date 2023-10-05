@@ -3,12 +3,12 @@ const express = require('express')
 const authController = require('../../controllers/auth');
 
 const { isEmptyBody, authenticate, upload, isEmptyAvatar, isValidEmail } = require('../../middlewares/index');
-const { validationBodySignIn, validationBodySignUp, validateSubscription } = require('../../models/User');
+const { validationBodySignIn, validationBodySignUp, validateSubscription, validationEmail } = require('../../models/User');
 
 const authRouter = express.Router();
 
 authRouter.get('/verify/:verificationToken', authController.verifyEmail);
-// authRouter.post('/verify', isValidEmail, validateBody(schemas.verifyEmailSchema), authController.resendVerifyEmail)
+authRouter.post('/verify', isValidEmail, validationEmail, authController.resendVerifyEmail)
 
 
 authRouter.post('/register', isEmptyBody, validationBodySignUp, authController.signup);
