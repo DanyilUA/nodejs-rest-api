@@ -7,6 +7,9 @@ const { validationBodySignIn, validationBodySignUp } = require('../../models/Use
 
 const authRouter = express.Router();
 
-authRouter.post('/users/register', isEmptyBody, validationBodySignIn, authController.signup);
+authRouter.post('/users/register', isEmptyBody, validationBodySignUp, authController.signup);
+authRouter.post('/users/login', isEmptyBody, validationBodySignIn, authController.signin);
+
+
 
 module.exports = authRouter; 
