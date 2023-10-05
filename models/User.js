@@ -5,6 +5,7 @@ const { HttpError } = require('../helpers/index');
 const Joi = require('joi');
 
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const subscriptionType = ['starter', 'pro', 'business'];
 
 const userSchema = new Schema(
   {
@@ -21,7 +22,7 @@ const userSchema = new Schema(
     },
     subscription: {
       type: String,
-      enum: ['starter', 'pro', 'business'],
+      enum: subscriptionType,
       default: 'starter',
     },
     owner: {
@@ -31,6 +32,7 @@ const userSchema = new Schema(
     },
     token: {
       type: String,
+      default: "",
     },
   },
   { versionKey: false, timestamps: true }
@@ -43,22 +45,29 @@ userSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
 userSchema.post('findOneAndUpdate', handleSaveError);
 
 const userSignUpSchema = Joi.object({
-  email: Joi.string().required().messages({
+  email: Joi.string().required().pattern(emailRegexp).messages({
     'any.required': 'missing required email field',
   }),
-  password: Joi.string().required().messages({
+  password: Joi.string().required().min(6).messages({
     'any.required': 'missing required password field',
   }),
-  subscription: Joi.string()
+  subscription: Joi.string().valid(...subscriptionType),
 });
 
 const userSignInSchema = Joi.object({
-  email: Joi.string().pattern(emailRegexp).required().messages({
+  email: Joi.string().required().pattern(emailRegexp).messages({
     'any.required': 'missing required email field',
   }),
   password: Joi.string().min(6).required().messages({
     'any.required': 'missing required password field',
   }),
+});
+
+const userSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...subscriptionType)
+    .required()
+    .messages({ 'any.required': 'missing required "subscription" field' }),
 });
 
 const User = model('user', userSchema);
@@ -79,8 +88,17 @@ const validationBodySignUp = (req, res, next) => {
   next();
 };
 
+const validateSubscription = (req, res, next) => {
+      const { error } = userSubscriptionSchema.validate(req.body);
+    if (error) {
+        return next(HttpError(400, error.message));
+    }
+    next();
+}
+
 module.exports = {
   User,
   validationBodySignIn,
   validationBodySignUp,
+  validateSubscription,
 };

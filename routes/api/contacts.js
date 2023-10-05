@@ -21,4 +21,3 @@ router.delete('/:contactId', isValidId, contactsController.deleteContact);
 
 module.exports = router
 
-// 6522dbae4f166a4ad631ee9e
