@@ -91,7 +91,7 @@ const getCurrent = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(req.user._id, { token: '' });
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(204).json();
     }
     catch (error) {
         next(error);
