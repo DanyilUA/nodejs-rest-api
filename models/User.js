@@ -25,11 +25,6 @@ const userSchema = new Schema(
       enum: subscriptionType,
       default: 'starter',
     },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-    //   required: true,
-    },
     token: {
       type: String,
       default: "",
