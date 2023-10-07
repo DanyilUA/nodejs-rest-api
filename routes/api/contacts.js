@@ -7,12 +7,12 @@ const { validationBody } = require('../../middlewares/index');
 
 router.get('/', contactsController.getAllContacts);
 
-router.get('/:contactId', contactsController.getContact);
+// router.get('/:contactId', contactsController.getContact);
 
-router.post('/', isEmptyBody, validationBody, contactsController.createContact);
+// router.post('/', isEmptyBody, validationBody, contactsController.createContact);
 
-router.put('/:contactId', isEmptyBody, validationBody, contactsController.updateContactById);
+// router.put('/:contactId', isEmptyBody, validationBody, contactsController.updateContactById);
 
-router.delete('/:contactId', contactsController.deleteContact);
+// router.delete('/:contactId', contactsController.deleteContact);
 
 module.exports = router
