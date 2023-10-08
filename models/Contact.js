@@ -28,10 +28,14 @@ const contactSchemaJoi = Joi.object({
   email: Joi.string().messages({
     'any.required': 'missing required email field',
   }),
-  phone: Joi.number().messages({
+  phone: Joi.string().messages({
     'any.required': 'missing required phone field',
   }),
   favorite: Joi.boolean(),
+});
+
+const contactFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
 });
 
 const validationBody = (req, res, next) => {
@@ -42,8 +46,16 @@ const validationBody = (req, res, next) => {
   next();
 };
 
+const contactUpdateFavorite = (req, res, next) => {
+  const { error } = contactFavoriteSchema.validate(req.body);
+  if (error) {
+    return next(HttpError(400, error.message));
+  }
+  next();
+}
 
-contactSchema.post("save", handleSaveError);
+
+contactSchema.post('save', handleSaveError);
 
 contactSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
 
@@ -52,6 +64,7 @@ contactSchema.post('findOneAndUpdate', handleSaveError);
 const Contact = model('contact', contactSchema);
 
 module.exports = {
+  contactUpdateFavorite,
   validationBody,
   Contact,
 };
