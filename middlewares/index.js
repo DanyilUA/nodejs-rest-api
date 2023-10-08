@@ -1,7 +1,7 @@
 const { isEmptyBody } = require('./isEmptyBody');
-const { validationBody } = require('./validationBody');
+const { isValidId } = require('./isValidId');
 
 module.exports = {
   isEmptyBody,
-  validationBody,
+  isValidId,
 };
