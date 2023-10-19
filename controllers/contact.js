@@ -3,7 +3,12 @@ const {Contact} = require('../models/Contact');
 
 const getAllContacts = async (req, res, next) => {
   try {
-    const result = await Contact.find();
+    const { _id: owner } = req.user;
+    // const { page = 1, limit = 20 } = req.query;
+    // const skip = (page -1) * limit;
+    // const result = await Contact.find({ owner }, { skip, limit }).populate("owner", "subscription email");
+    const result = await Contact.find({ owner }).populate("owner", "subscription email");
+
     res.json(result);
   } catch (error) {
     next(error);
@@ -12,8 +17,9 @@ const getAllContacts = async (req, res, next) => {
 
 const getContact = async (req, res, next) => {
   try {
+    const { _id: owner } = req.user;
     const { contactId } = req.params;
-    const result = await Contact.findById(contactId);
+    const result = await Contact.findOne({_id: contactId, owner});
     if (!result) {
       throw HttpError(404, `Not found`);
     }
@@ -25,7 +31,8 @@ const getContact = async (req, res, next) => {
 
 const createContact = async (req, res, next) => {
   try {
-    const result = await Contact.create(req.body);
+    const { _id: owner } = req.user;
+    const result = await Contact.create({...req.body, owner});
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -35,8 +42,9 @@ const createContact = async (req, res, next) => {
 const updateContactById = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+    const { _id: owner } = req.user;
 
-    const result = await Contact.findByIdAndUpdate(contactId, req.body);
+    const result = await Contact.findOneAndUpdate({_id: contactId, owner}, req.body);
     if (!result) {
       throw HttpError(404, 'Not found');
     }
@@ -49,7 +57,9 @@ const updateContactById = async (req, res, next) => {
 const deleteContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const result = await Contact.findByIdAndDelete(contactId);
+    const { _id: owner } = req.user;
+
+    const result = await Contact.findOneAndDelete({_id: contactId, owner});
     if (!result) {
       throw HttpError(404, 'Not found');
     }
@@ -64,8 +74,9 @@ const deleteContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+    const { _id: owner } = req.user;
 
-    const result = await Contact.findByIdAndUpdate(contactId, req.body);
+    const result = await Contact.findOneAndUpdate({_id: contactId, owner}, req.body);
     if (!result) {
       throw HttpError(404, 'Not found');
     }

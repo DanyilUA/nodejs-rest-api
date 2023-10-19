@@ -2,9 +2,10 @@ const express = require('express')
 
 const router = express.Router()
 const contactsController = require("../../controllers/contact");
-const { isEmptyBody, isValidId, isEmptFieldFavorite } = require('../../middlewares/index');
+const { isEmptyBody, authenticate, isValidId, isEmptFieldFavorite } = require('../../middlewares/index');
 const { validationBody, contactUpdateFavorite } = require('../../models/Contact');
 
+router.use(authenticate);
 
 router.get('/', contactsController.getAllContacts);
 
@@ -20,4 +21,3 @@ router.delete('/:contactId', isValidId, contactsController.deleteContact);
 
 module.exports = router
 
-// 6522dbae4f166a4ad631ee9e
