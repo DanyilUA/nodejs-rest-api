@@ -2,7 +2,7 @@ const express = require('express')
 
 const authController = require('../../controllers/auth');
 
-const { isEmptyBody, authenticate } = require('../../middlewares/index');
+const { isEmptyBody, authenticate, upload, isEmptyAvatar } = require('../../middlewares/index');
 const { validationBodySignIn, validationBodySignUp, validateSubscription } = require('../../models/User');
 
 const authRouter = express.Router();
@@ -12,6 +12,8 @@ authRouter.post('/login', isEmptyBody, validationBodySignIn, authController.sign
 authRouter.get('/current', authenticate, authController.getCurrent);
 authRouter.post('/logout', authenticate, authController.logout);
 authRouter.patch('/', authenticate, validateSubscription, authController.updateSubscription);
+authRouter.patch('/avatars', authenticate, upload.single('avatar'), authController.updateAvatar);
+
 
 
 module.exports = authRouter; 
